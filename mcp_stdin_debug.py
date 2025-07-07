@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import json
 import subprocess
 import sys
 import threading
@@ -7,7 +8,17 @@ LOG_FILE = "mcp_session.log"
 
 
 def log_write(log_f, prefix, data):
-    log_f.write(f"{prefix}: {data}")
+    stripped_data = data.strip()
+    if not stripped_data:
+        log_f.write(f"{prefix}: {data}")
+        log_f.flush()
+        return
+    try:
+        json_obj = json.loads(stripped_data)
+        pretty_json = json.dumps(json_obj, indent=4)
+        log_f.write(f"{prefix}:\n{pretty_json}\n")
+    except json.JSONDecodeError:
+        log_f.write(f"{prefix}: {data}")
     log_f.flush()
 
 
