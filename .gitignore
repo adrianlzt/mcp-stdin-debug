@@ -1,0 +1,4 @@
+build/
+dist/
+mcp_stdin_debug.egg-info/
+mcp_session.log
