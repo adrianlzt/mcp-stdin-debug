@@ -48,6 +48,17 @@ def read_from_proc(proc_stdout, log_f):
         pass
 
 
+def read_from_proc_stderr(proc_stderr, log_f):
+    try:
+        while True:
+            server_response = proc_stderr.readline()
+            if not server_response:
+                break
+            log_write(log_f, "STDERR", server_response)
+    except Exception as e:
+        pass
+
+
 def main():
     if len(sys.argv) < 2:
         print("Usage: mcp-stdin-debug <command to run>", file=sys.stderr)
@@ -58,7 +69,7 @@ def main():
             command,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
+            stderr=subprocess.PIPE,
             text=True,
         )
         t_stdin = threading.Thread(
@@ -67,11 +78,16 @@ def main():
         t_stdout = threading.Thread(
             target=read_from_proc, args=(proc.stdout, log_f), daemon=True
         )
+        t_stderr = threading.Thread(
+            target=read_from_proc_stderr, args=(proc.stderr, log_f), daemon=True
+        )
         t_stdin.start()
         t_stdout.start()
+        t_stderr.start()
         t_stdin.join()
         proc.stdin.close()
         t_stdout.join()
+        t_stderr.join()
         proc.wait()
 
 
