@@ -17,7 +17,7 @@ def read_from_stdin(proc_stdin, log_f):
             user_input = sys.stdin.readline()
             if not user_input:
                 break
-            proc_stdin.write(user_input.encode())
+            proc_stdin.write(user_input)
             proc_stdin.flush()
             log_write(log_f, "STDIN", user_input)
     except Exception as e:
@@ -30,10 +30,9 @@ def read_from_proc(proc_stdout, log_f):
             server_response = proc_stdout.readline()
             if not server_response:
                 break
-            decoded = server_response.decode()
-            sys.stdout.write(decoded)
+            sys.stdout.write(server_response)
             sys.stdout.flush()
-            log_write(log_f, "STDOUT", decoded)
+            log_write(log_f, "STDOUT", server_response)
     except Exception as e:
         pass
 
@@ -49,7 +48,7 @@ def main():
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
-            bufsize=1,
+            text=True,
         )
         t_stdin = threading.Thread(
             target=read_from_stdin, args=(proc.stdin, log_f), daemon=True
