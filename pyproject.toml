@@ -1,0 +1,6 @@
+[project]
+name = "mcp-stdin-debug"
+version = "0.1.0"
+
+[project.scripts]
+mcp-stdin-debug = "mcp_stdin_debug:main"
